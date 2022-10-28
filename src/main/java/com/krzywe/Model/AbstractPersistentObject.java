@@ -8,13 +8,10 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Source;
-import org.hibernate.annotations.SourceType;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.krzywe.Utils.IdGenerator;
 
-import javax.annotation.processing.SupportedSourceVersion;
 import javax.persistence.Id;
 
 @MappedSuperclass
