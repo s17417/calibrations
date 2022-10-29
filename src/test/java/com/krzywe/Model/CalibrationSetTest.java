@@ -40,7 +40,7 @@ public class CalibrationSetTest {
 	public void checkCalibrationSetName() {
 		calibrationSet.setName(null);
 		var exception = assertThrows(ConstraintViolationException.class, ()->testEntityManager.persistAndFlush(calibrationSet));
-		assertTrue(exception.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid field cannot be empty")));
+		assertTrue(exception.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid field can't be empty")));
 		
 		calibrationSet.setName("2");
 		exception = assertThrows(ConstraintViolationException.class, () ->testEntityManager.persistAndFlush(calibrationSet));	
@@ -75,7 +75,7 @@ public class CalibrationSetTest {
 	public void checkCalibrationSetMaterialType() {
 		calibrationSet.setMaterialType(null);
 		var exception = assertThrows(ConstraintViolationException.class, () -> testEntityManager.persistAndFlush(calibrationSet));
-		assertTrue(exception.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid field cannot be empty")));	
+		assertTrue(exception.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid field can't be empty")));	
 	}
 
 }

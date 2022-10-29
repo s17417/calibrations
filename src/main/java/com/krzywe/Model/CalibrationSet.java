@@ -31,7 +31,7 @@ public class CalibrationSet extends AbstractPersistentObject {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@NotBlank(message="valid field cannot be empty")
+	@NotBlank(message="valid field can't be empty")
 	@Size(min=3, max=50, message = "valid length - 3 to 50 chars")
 	@Column(unique = true, nullable=false, length = 50)
 	private String name;
@@ -42,7 +42,7 @@ public class CalibrationSet extends AbstractPersistentObject {
 	@FutureOrPresent(message ="valid date from future or present")
 	private LocalDate expirationDate;
 	
-	@NotNull(message = "valid field cannot be empty")
+	@NotNull(message = "valid field can't be empty")
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private MaterialType materialType;

@@ -15,6 +15,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+
+/**
+ * Calibration point, groups an analytes by their exact target concentration, is part of CalibrationSet
+ *  Attribute {@link CalibrationSet} is {@link NotNull}
+ * @author tomek
+ *
+ */
 @Entity
 public class CalibrationPoint extends AbstractPersistentObject {
 	 
@@ -24,7 +31,7 @@ public class CalibrationPoint extends AbstractPersistentObject {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@NotBlank(message = "valid field cannot be empty")
+	@NotBlank(message = "valid field can't be empty")
 	@Size(min = 3, max = 32, message = "valid length - 3 to 32 chars")
 	@Column(nullable = false, unique = false, length = 32)
 	private String pointId;
@@ -35,7 +42,7 @@ public class CalibrationPoint extends AbstractPersistentObject {
 	@Column(length = 32)
 	private List<@Size(min = 3,max = 32, message = "valid length - 3 to 32 chars") String> aliases = new ArrayList<String>();
 
-	@NotNull(message = "valid field cannot be empty")
+	@NotNull(message = "valid field can't be empty")
 	@ManyToOne(optional = false)
 	@JoinColumn(nullable = false,foreignKey = @ForeignKey(name="FK_CALIBRATION_SET"))
 	private CalibrationSet calibrationSet;
@@ -47,11 +54,16 @@ public class CalibrationPoint extends AbstractPersistentObject {
 	public void setPointId(String pointId) {
 		this.pointId = pointId;
 	}
-
+	
+	/**
+	 *  Return CalibrationSet. This Attribute is {@link NotNull}.
+	 * @param calibrationSet
+	 */
 	public CalibrationSet getCalibrationSet() {
 		return calibrationSet;
 	}
 
+	
 	public void setCalibrationSet(CalibrationSet calibrationSet) {
 		if (this.calibrationSet == null) {
 			if (calibrationSet == null) return;
@@ -63,6 +75,11 @@ public class CalibrationPoint extends AbstractPersistentObject {
 			this.calibrationSet=calibrationSet;
 	}
 
+	/**
+	 * Return list of aliases stored in upper case. List {@link Size} up to 32 and alias {@link Size} 3 - 32.
+	 * 
+	 * @return {@link List}<{@link String}>
+	 */
 	public List<String> getAliases() {
 		return aliases;
 	}
@@ -78,11 +95,19 @@ public class CalibrationPoint extends AbstractPersistentObject {
 				);
 	}
 	
+	/**
+	 * Adds alias to aliases list. Alias is transformed to upper case. List {@link Size} up to 32 and alias {@link Size} 3 - 32.
+	 * @param {@link String} alias
+	 */
 	public void addAlias(String alias) {
 		if (!this.aliases.contains(alias.toUpperCase()))
 			this.aliases.add(alias.toUpperCase());
 	}
 	
+	/**
+	 * Removes alias to aliases list. Alias is transformed to upper case. List {@link Size} up to 32 and alias {@link Size} 3 - 32.
+	 * @param {@link String} alias
+	 */
 	public void removeAlias(String alias) {
 		this.aliases.remove(alias.toUpperCase());
 	}

@@ -62,11 +62,11 @@ public class CalibrationPointTest {
 	public void checkCalibrationPointPointId() {
 		calibrationPoint.setPointId(null);
 		var exp = assertThrows(ConstraintViolationException.class, () -> testEntityManager.persistAndFlush(calibrationPoint));
-		assertTrue(exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid field cannot be empty")));
+		assertTrue(exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid field can't be empty")));
 
 		calibrationPoint.setPointId(" ");
 		exp = assertThrows(ConstraintViolationException.class, () -> testEntityManager.persistAndFlush(calibrationPoint));
-		assertTrue(exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid field cannot be empty")));
+		assertTrue(exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid field can't be empty")));
 		
 		calibrationPoint.setPointId("12");
 		exp = assertThrows(ConstraintViolationException.class, () -> testEntityManager.persistAndFlush(calibrationPoint));
