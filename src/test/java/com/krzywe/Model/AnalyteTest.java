@@ -90,12 +90,14 @@ public class AnalyteTest {
 				analyte.removeAlias(list.remove(1).toUpperCase());
 				assertDoesNotThrow(() -> testEntityManager.flush());
 		
-		//check list size and String length
+		//check list size, String length and repeated aliases
 		analyte.setAliases(Stream.generate(stringSupplier).limit(33).collect(Collectors.toList()));
-		analyte.addAlias(Strings.repeat("qq", 17));		
+		analyte.addAlias(Strings.repeat("qq", 17));	
+		analyte.addAlias(analyte.getAliases().get(0));
 		var exp = assertThrows(ConstraintViolationException.class, () -> testEntityManager.flush());
 		assertTrue(() -> exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid collection size - up to 32 aliases")));
 		assertTrue(() -> exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid length - 3 to 32 chars")));
+		assertTrue(() -> exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("must contain only unique elements")));
 		
 	}
 }

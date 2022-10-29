@@ -10,8 +10,12 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OrderColumn;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.UniqueElements;
 
 /**
  * Entity being equivalent to analyte.
@@ -21,6 +25,7 @@ import javax.validation.constraints.Size;
  *
  */
 @Entity
+@Table(uniqueConstraints = {@UniqueConstraint(name = "UK_ANALYTE_NAME",columnNames = { "name" })})
 public class Analyte extends AbstractPersistentObject {
 
 	/**
@@ -30,11 +35,12 @@ public class Analyte extends AbstractPersistentObject {
 	
 	@NotBlank (message = "valid field can't be empty")
 	@Size(min = 3, max = 100, message = "valid length - 3 to 100 chars")
-	@Column(unique = true, nullable = false, length = 100)
+	@Column(nullable = false, length = 100)
 	private String name;
 	
 	@Size(max = 32, message = "valid collection size - up to 32 aliases")
 	@ElementCollection(fetch = FetchType.LAZY)
+	@UniqueElements(message = "must contain only unique elements")
 	@OrderColumn(name = "ALIAS_ORDER")
 	@Column(length = 32)
 	private List<@Size(min = 3, max = 32, message = "valid length - 3 to 32 chars") String> aliases = new ArrayList<>();
@@ -62,7 +68,7 @@ public class Analyte extends AbstractPersistentObject {
 
 	public void setAliases(Collection<String> aliases) {
 		this.aliases.clear();
-		this.aliases.addAll(aliases.stream().map(String::toUpperCase).distinct().collect(Collectors.toList()));
+		this.aliases.addAll(aliases.stream().map(String::toUpperCase).collect(Collectors.toList()));
 	}
 	
 	/**
@@ -70,7 +76,6 @@ public class Analyte extends AbstractPersistentObject {
 	 * @param {@link String} alias
 	 */
 	public void addAlias(String alias) {
-		if (!this.aliases.contains(alias.toUpperCase()))
 			this.aliases.add(alias.toUpperCase());
 	}
 	
@@ -79,7 +84,6 @@ public class Analyte extends AbstractPersistentObject {
 	 * @param {@link String} alias
 	 */
 	public void removeAlias (String alias) {
-		if (this.aliases.contains(alias.toUpperCase()))
 			this.aliases.remove(alias.toUpperCase());
 	}
 	
