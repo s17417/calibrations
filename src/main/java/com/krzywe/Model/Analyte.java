@@ -9,6 +9,8 @@ import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.JoinColumn;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -42,6 +44,7 @@ public class Analyte extends AbstractPersistentObject {
 	@ElementCollection(fetch = FetchType.LAZY)
 	@UniqueElements(message = "must contain only unique elements")
 	@OrderColumn(name = "ALIAS_ORDER")
+	@JoinColumn(foreignKey = @ForeignKey(name = "FK_ANALYTE_ID"))
 	@Column(length = 32)
 	private List<@Size(min = 3, max = 32, message = "valid length - 3 to 32 chars") String> aliases = new ArrayList<>();
 
