@@ -45,12 +45,13 @@ public class CalibrationPoint extends AbstractPersistentObject {
 	@ElementCollection(fetch = FetchType.LAZY)
 	@UniqueElements(message = "must contain only unique elements")
 	@OrderColumn(name = "ALIAS_ORDER")
+	@JoinColumn(foreignKey = @ForeignKey(name="FK_CALIBRATION_POINT_ID"))
 	@Column(length = 32)
 	private List<@Size(min = 3,max = 32, message = "valid length - 3 to 32 chars") String> aliases = new ArrayList<String>();
 
 	@NotNull(message = "valid field can't be empty")
 	@ManyToOne(optional = false)
-	@JoinColumn(nullable = false,foreignKey = @ForeignKey(name="FK_CALIBRATION_SET"))
+	@JoinColumn(nullable = false,foreignKey = @ForeignKey(name="FK_CALIBRATION_SET_ID"))
 	private CalibrationSet calibrationSet;
 
 	public String getPointId() {
