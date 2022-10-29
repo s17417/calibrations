@@ -11,6 +11,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -24,6 +26,7 @@ import javax.validation.constraints.Size;
  * @author tomek
  */
 @Entity
+@Table(uniqueConstraints = {@UniqueConstraint(name = "UK_CALIBRATION_SET_NAME",columnNames = { "name" })})
 public class CalibrationSet extends AbstractPersistentObject {
 
 	/**
@@ -33,7 +36,7 @@ public class CalibrationSet extends AbstractPersistentObject {
 
 	@NotBlank(message="valid field can't be empty")
 	@Size(min=3, max=50, message = "valid length - 3 to 50 chars")
-	@Column(unique = true, nullable=false, length = 50)
+	@Column(nullable=false, length = 50)
 	private String name;
 	
 	@PastOrPresent(message = "valid date from past or present")

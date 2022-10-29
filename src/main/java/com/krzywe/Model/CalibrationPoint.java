@@ -11,9 +11,13 @@ import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderColumn;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import org.hibernate.validator.constraints.UniqueElements;
 
 
 /**
@@ -23,6 +27,7 @@ import javax.validation.constraints.Size;
  *
  */
 @Entity
+@Table(uniqueConstraints = {@UniqueConstraint(name = "UK_CALIBRATION_POINT_POINTID",columnNames = { "pointId" })})
 public class CalibrationPoint extends AbstractPersistentObject {
 	 
 	
@@ -33,11 +38,12 @@ public class CalibrationPoint extends AbstractPersistentObject {
 
 	@NotBlank(message = "valid field can't be empty")
 	@Size(min = 3, max = 32, message = "valid length - 3 to 32 chars")
-	@Column(nullable = false, unique = false, length = 32)
+	@Column(nullable = false, length = 32)
 	private String pointId;
 
 	@Size(max = 32, message = "valid collection size - up to 32 aliases")
 	@ElementCollection(fetch = FetchType.LAZY)
+	@UniqueElements(message = "must contain only unique elements")
 	@OrderColumn(name = "ALIAS_ORDER")
 	@Column(length = 32)
 	private List<@Size(min = 3,max = 32, message = "valid length - 3 to 32 chars") String> aliases = new ArrayList<String>();
@@ -89,7 +95,6 @@ public class CalibrationPoint extends AbstractPersistentObject {
 		this.aliases.addAll(
 				aliases
 				.stream()
-				.distinct()
 				.map(String::toUpperCase)
 				.collect(Collectors.toList())
 				);
@@ -100,7 +105,6 @@ public class CalibrationPoint extends AbstractPersistentObject {
 	 * @param {@link String} alias
 	 */
 	public void addAlias(String alias) {
-		if (!this.aliases.contains(alias.toUpperCase()))
 			this.aliases.add(alias.toUpperCase());
 	}
 	

@@ -83,7 +83,6 @@ public class CalibrationPointTest {
 		calibrationPoint.setAliases(list);
 		calibrationPoint.addAlias("koldds");
 		calibrationPoint.addAlias("opo");
-		calibrationPoint.addAlias("opo");
 		list.add("koldds");
 		list.add("opo");
 		
@@ -120,11 +119,11 @@ public class CalibrationPointTest {
 				.collect(Collectors.toList())
 				);
 		calibrationPoint.addAlias(Strings.repeat("q", 33));
+		calibrationPoint.addAlias(calibrationPoint.getAliases().get(0));
 		var exp = assertThrows(ConstraintViolationException.class,() -> testEntityManager.flush());
-		assertTrue(exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid collection size - up to 32 aliases")));
-		assertTrue(exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid length - 3 to 32 chars")));
-		
-		System.out.println(exp);
+		assertTrue(() -> exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid collection size - up to 32 aliases")));
+		assertTrue(() -> exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid length - 3 to 32 chars")));
+		assertTrue(() -> exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("must contain only unique elements")));
 	}
 
 }
