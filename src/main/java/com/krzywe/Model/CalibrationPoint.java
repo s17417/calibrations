@@ -78,8 +78,11 @@ public class CalibrationPoint extends AbstractPersistentObject {
 				this.calibrationSet=calibrationSet;
 				return;
 		}
-		if (this.calibrationSet.getCalibrationPoints().remove(this))
+		if (this.calibrationSet.getCalibrationPoints().remove(this)) {
 			this.calibrationSet=calibrationSet;
+			if (this.calibrationSet!=null)
+				this.calibrationSet.getCalibrationPoints().add(this);
+		}
 	}
 
 	/**
