@@ -28,6 +28,7 @@ public class LaboratoryTestTest {
 		laboratoryTest.setMaterialType(MaterialType.DBS);
 	}
 	
+	@Test
 	public void checkCorrectLaboratoryTestValues() {
 		assertDoesNotThrow(() -> testEntityManager.persistAndFlush(laboratoryTest));
 	}
