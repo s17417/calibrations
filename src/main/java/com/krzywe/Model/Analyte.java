@@ -2,15 +2,19 @@ package com.krzywe.Model;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -48,6 +52,8 @@ public class Analyte extends AbstractPersistentObject {
 	@Column(length = 32)
 	private List<@Size(min = 3, max = 32, message = "valid length - 3 to 32 chars") String> aliases = new ArrayList<>();
 
+	@OneToMany(mappedBy = "analyte", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<Method> method = new HashSet<>();
 	
 	/**
 	 *  Returns name of unique name of Analyte. Attribute {@link Size} 3 - 100, {@link NotBlank} and unique. 
@@ -88,6 +94,25 @@ public class Analyte extends AbstractPersistentObject {
 	 */
 	public void removeAlias (String alias) {
 			this.aliases.remove(alias.toUpperCase());
+	}
+
+	public Set<Method> getMethod() {
+		return method;
+	}
+
+	public void setMethod(Set<Method> method) {
+		this.method.clear();
+		this.method.addAll(method);
+	}
+	
+	public void addMethod(Method method) {
+		method.setAnalyte(this);
+	}
+	
+	public void removeMethod(Method method) {
+		if (this.method.contains(method)) {
+			method.setAnalyte(null);
+		}
 	}
 	
 

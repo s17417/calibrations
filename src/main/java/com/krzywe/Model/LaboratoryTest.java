@@ -1,9 +1,16 @@
 package com.krzywe.Model;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.ForeignKey;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
@@ -29,6 +36,9 @@ public class LaboratoryTest extends AbstractPersistentObject {
 	@NotNull(message = "valid field can't be empty")
 	@Enumerated(EnumType.STRING)
 	private MaterialType materialType;
+	
+	@OneToMany(mappedBy = "laboratoryTest", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<Method> method = new HashSet<>();
 
 	/**
 	 * Returns laboratory test name. Applied constraints {@link NotBlank}, {@link Size} 3 - 100 and unique
@@ -53,5 +63,25 @@ public class LaboratoryTest extends AbstractPersistentObject {
 	public void setMaterialType(MaterialType materialType) {
 		this.materialType = materialType;
 	}
+
+	public Set<Method> getMethod() {
+		return method;
+	}
+
+	public void setMethod(Set<Method> method) {
+		this.method.clear();
+		this.method.addAll(method);
+	}
+	
+	public void addMethod(Method method) {
+		method.setLaboratoryTest(this);
+	}
+	
+	public void removeMethod(Method method) {
+		if (this.method.contains(method))
+			method.setLaboratoryTest(null);
+	}
+	
+	
 	
 }
