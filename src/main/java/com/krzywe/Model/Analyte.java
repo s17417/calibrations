@@ -100,7 +100,7 @@ public class Analyte extends AbstractPersistentObject {
 		return method;
 	}
 
-	public void setMethod(Set<Method> method) {
+	public <V extends Collection<Method>> void setMethod(V method) {
 		this.method.clear();
 		this.method.addAll(method);
 	}

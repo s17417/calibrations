@@ -1,5 +1,6 @@
 package com.krzywe.Model;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -68,7 +69,7 @@ public class LaboratoryTest extends AbstractPersistentObject {
 		return method;
 	}
 
-	public void setMethod(Set<Method> method) {
+	public <V extends Collection<Method>> void setMethod(V method) {
 		this.method.clear();
 		this.method.addAll(method);
 	}

@@ -1,6 +1,7 @@
 package com.krzywe.Model;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -109,7 +110,7 @@ public class CalibrationSet extends AbstractPersistentObject {
 		return calibrationPoints;
 	}
 
-	public void setCalibrationPoints(Set<CalibrationPoint> calibrationPoints) {
+	public <V extends Collection<CalibrationPoint>> void setCalibrationPoints(V calibrationPoints) {
 		this.calibrationPoints.clear();
 		this.calibrationPoints.addAll(calibrationPoints);
 	}
