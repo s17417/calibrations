@@ -12,6 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.krzywe.Utils.IdGenerator;
 
+import javax.persistence.Column;
 import javax.persistence.Id;
 
 @MappedSuperclass
@@ -23,6 +24,7 @@ public abstract class AbstractPersistentObject implements Serializable{
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@Column(length = 36)
 	private String Id=IdGenerator.getId();
 	
 	@Version
