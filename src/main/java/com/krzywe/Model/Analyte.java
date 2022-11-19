@@ -39,18 +39,18 @@ public class Analyte extends AbstractPersistentObject {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	@NotBlank (message = "valid field can't be empty")
-	@Size(min = 3, max = 100, message = "valid length - 3 to 100 chars")
+	@NotBlank
+	@Size(min = 3, max = 100)
 	@Column(nullable = false, length = 100)
 	private String name;
 	
-	@Size(max = 32, message = "valid collection size - up to 32 aliases")
+	@Size(max = 32, message = "{aliases.Size.message}")
 	@ElementCollection(fetch = FetchType.LAZY)
-	@UniqueElements(message = "must contain only unique elements")
+	@UniqueElements
 	@OrderColumn(name = "ALIAS_ORDER")
 	@JoinColumn(foreignKey = @ForeignKey(name = "FK_ANALYTE_ID"))
 	@Column(length = 32)
-	private List<@Size(min = 3, max = 32, message = "valid length - 3 to 32 chars") String> aliases = new ArrayList<>();
+	private List<@Size(min = 3, max = 32) String> aliases = new ArrayList<>();
 
 	@OneToMany(mappedBy = "analyte", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Method> method = new HashSet<>();

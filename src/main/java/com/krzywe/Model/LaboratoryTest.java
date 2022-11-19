@@ -29,12 +29,12 @@ public class LaboratoryTest extends AbstractPersistentObject {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	@NotBlank(message = "valid field can't be empty")
-	@Size(min=3, max=100, message = "valid length - 3 to 100 chars")
+	@NotBlank
+	@Size(min=3, max=100)
 	@Column(nullable = false, length = 100)
 	private String name;
 	
-	@NotNull(message = "valid field can't be empty")
+	@NotNull
 	@Enumerated(EnumType.STRING)
 	private MaterialType materialType;
 	

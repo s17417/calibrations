@@ -1,8 +1,13 @@
 package com.krzywe.Model;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -10,6 +15,7 @@ import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -36,23 +42,26 @@ public class CalibrationPoint extends AbstractPersistentObject {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@NotBlank(message = "valid field can't be empty")
-	@Size(min = 3, max = 32, message = "valid length - 3 to 32 chars")
+	@NotBlank
+	@Size(min = 3, max = 32)
 	@Column(nullable = false, length = 32)
 	private String pointId;
 
-	@Size(max = 32, message = "valid collection size - up to 32 aliases")
+	@Size(max = 32, message = "{aliases.Size.message}")
 	@ElementCollection(fetch = FetchType.LAZY)
-	@UniqueElements(message = "must contain only unique elements")
+	@UniqueElements
 	@OrderColumn(name = "ALIAS_ORDER")
 	@JoinColumn(foreignKey = @ForeignKey(name="FK_CALIBRATION_POINT_ID"))
 	@Column(length = 32)
-	private List<@Size(min = 3,max = 32, message = "valid length - 3 to 32 chars") String> aliases = new ArrayList<String>();
+	private List<@Size(min = 3,max = 32) String> aliases = new ArrayList<String>();
 
-	@NotNull(message = "valid field can't be empty")
+	@NotNull
 	@ManyToOne(optional = false)
 	@JoinColumn(nullable = false,foreignKey = @ForeignKey(name="FK_CALIBRATION_SET_ID"))
 	private CalibrationSet calibrationSet;
+	
+	@OneToMany(cascade = CascadeType.ALL,fetch = FetchType.LAZY, mappedBy = "calibrationPoint", orphanRemoval = true)
+	private Set<TargetValue> targetValues = new HashSet<>();
 
 	public String getPointId() {
 		return pointId;
@@ -119,6 +128,19 @@ public class CalibrationPoint extends AbstractPersistentObject {
 	public void removeAlias(String alias) {
 		this.aliases.remove(alias.toUpperCase());
 	}
+
+	public Set<TargetValue> getTargetValues() {
+		return targetValues;
+	}
+
+	public <V extends Collection<TargetValue>> void setTargetValues(V targetValues) {
+		this.targetValues.clear();
+		this.targetValues.addAll(targetValues);
+	}
+
+	
+	
+	
 	
 	
 	

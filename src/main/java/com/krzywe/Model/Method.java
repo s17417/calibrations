@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 
 /**
  * Class representing method belonging to a laboratory test describing a way to analyze one of analytes by analytical method and type of raw readings from instruments as response value units.
- * All fields ar optional.
+ * All fields ar optional besides laboratory test and analyte attributes.
  * @author tomek
  *
  */
@@ -31,24 +31,24 @@ public class Method implements Serializable {
 	@EmbeddedId
 	private MethodId id = new MethodId();
 	
-	@NotNull(message = "valid field can't be empty")
+	@NotNull
 	@ManyToOne
 	@MapsId("analyteId")
 	@JoinColumn(foreignKey = @ForeignKey(name = "FK_METHOD_ANALYTE_ID"))
 	private Analyte analyte;
 	
-	@NotNull(message = "valid field can't be empty")
+	@NotNull
 	@ManyToOne
 	@MapsId("laboratoryTestId")
 	@JoinColumn(foreignKey = @ForeignKey(name = "FK_METHOD_LABORATORYTEST_ID"))
 	private LaboratoryTest laboratoryTest;
 	
-	@Size(max = 100, message = "valid length - 1 to 100 chars")
+	@Size(max = 100)
 	@Column(nullable = true, length = 100)
 	private String responseValueUnits;
 	
 	
-	@Size (min = 3, max = 100, message = "valid length - 3 to 100 chars")
+	@Size(min = 3, max = 100)
 	@Column (nullable = true, length = 100)
 	private String analyticalMethod;
 
@@ -77,7 +77,7 @@ public class Method implements Serializable {
 
 	/**
 	 * Returns analytical method type
-	 * @return String
+	 * @return {@link String}
 	 */
 	public String getAnalyticalMethod() {
 		return analyticalMethod;
@@ -88,11 +88,13 @@ public class Method implements Serializable {
 		this.analyticalMethod = analyticalMethod;
 	}
 
-
+	/**
+	 * Returns associated to this method analyte. Attribute {@link NotNull} and is part of primary key.
+	 * @return {@link Analyte}
+	 */
 	public Analyte getAnalyte() {
 		return analyte;
 	}
-
 
 	public void setAnalyte(Analyte analyte) {
 		if (this.analyte==null) {
@@ -108,7 +110,10 @@ public class Method implements Serializable {
 		}
 	}
 
-
+	/**
+	 * Returns an laboratory test containing this method. Attribute {@link NotNull} and is part of primary key.
+	 * @return {@link LaboratoryTest}
+	 */
 	public LaboratoryTest getLaboratoryTest() {
 		return laboratoryTest;
 	}
