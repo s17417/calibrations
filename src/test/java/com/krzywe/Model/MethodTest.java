@@ -37,16 +37,17 @@ public class MethodTest {
 		analyte.setName(Strings.repeat("qw", 2));
 		laboratoryTest.setName(Strings.repeat("fd", 2));
 		laboratoryTest.setMaterialType(MaterialType.LEUKOCYTES);
-		method.setAnalyte(analyte);
-		method.setLaboratoryTest(laboratoryTest);
 
 		testEntityManager.persist(laboratoryTest);
 		testEntityManager.persist(analyte);
+		
+		method.setAnalyte(analyte);
+		method.setLaboratoryTest(laboratoryTest);
 		testEntityManager.persist(method);
 	}
 	
 	@Test
-	public void checkCorrectCalibrationSetValues() {
+	public void checkCorrectMethodValues() {
 		assertDoesNotThrow(() -> testEntityManager.flush());
 	}
 	
@@ -57,7 +58,7 @@ public class MethodTest {
 		
 		method.setResponseValueUnits(Strings.repeat("La", 51));
 		var exp = assertThrows(ConstraintViolationException.class, () -> testEntityManager.flush());
-		assertTrue(exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid length - 1 to 100 chars")));
+		assertTrue(exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid length - up to 100 chars")));
 		
 	}
 	
