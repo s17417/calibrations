@@ -1,25 +1,44 @@
 package com.krzywe.Model;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doAnswer;
 
-import javax.validation.ConstraintViolationException;
+import java.util.stream.Stream;
+
+import javax.validation.Validation;
+import javax.validation.Validator;
 
 import org.apache.logging.log4j.util.Strings;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@DataJpaTest
+@ExtendWith(MockitoExtension.class)
+@TestInstance(Lifecycle.PER_CLASS)
 public class LaboratoryTestTest {
-
-	@Autowired
-	private TestEntityManager testEntityManager;
+	
+	private Validator validator;
+	
+	@Mock
+	private Method method;
 	
 	private LaboratoryTest laboratoryTest;
+	
+	@BeforeAll
+	private void beforeAll(){
+		validator = Validation.buildDefaultValidatorFactory().getValidator();
+	}
 	
 	@BeforeEach
 	private void beforeEach() {
@@ -30,36 +49,73 @@ public class LaboratoryTestTest {
 	
 	@Test
 	public void checkCorrectLaboratoryTestValues() {
-		assertDoesNotThrow(() -> testEntityManager.persistAndFlush(laboratoryTest));
+		assertTrue(validator.validate(laboratoryTest).isEmpty());
+	}
+	
+	@ParameterizedTest
+	@NullAndEmptySource
+	@ValueSource(strings = {" ","1"})
+	@MethodSource("longStringSupplier")
+	public void checkLaboratoryTest_Name(String name) {
+		laboratoryTest.setName(name);
+		
+		var exp = validator.validate(laboratoryTest);
+		
+		assertTrue(
+				exp
+				.stream()
+				.anyMatch(obj -> 
+						obj.getMessage().contains("valid field can't be empty")||
+						obj.getMessage().contains("valid length - 3 to 100 chars")
+						)
+				);		
+	}
+	
+	private Stream<String> longStringSupplier(){
+		return Stream.of(Strings.repeat("A", 101));
 	}
 	
 	@Test
-	public void checkLaboratoryTestName() {
-		testEntityManager.persist(laboratoryTest);
-		
-		laboratoryTest.setName(null);
-		var exp = assertThrows(ConstraintViolationException.class, () ->testEntityManager.flush());
-		assertTrue(exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid field can't be empty")));
-		
-		laboratoryTest.setName(" ");
-		exp = assertThrows(ConstraintViolationException.class, () ->testEntityManager.flush());
-		assertTrue(exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid field can't be empty")));
-		
-		laboratoryTest.setName("1");
-		exp = assertThrows(ConstraintViolationException.class, () ->testEntityManager.flush());
-		assertTrue(exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid length - 3 to 100 chars")));
-		
-		laboratoryTest.setName(Strings.repeat("q", 101));
-		exp = assertThrows(ConstraintViolationException.class, () ->testEntityManager.flush());
-		assertTrue(exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid length - 3 to 100 chars")));
-		
-	}
-	
-	public void checkLaboratoryTestMaterialType() {
-		testEntityManager.persist(laboratoryTest);
+	public void checkLaboratoryTest_MaterialTypeNotNull() {
 		
 		laboratoryTest.setMaterialType(null);
-		var exp = assertThrows(ConstraintViolationException.class, () -> testEntityManager.flush());
-		assertTrue(exp.getConstraintViolations().stream().anyMatch(obj -> obj.getMessage().contains("valid field can't be empty")));
+		var exp = validator.validate(laboratoryTest);
+		assertTrue(
+				exp
+				.stream()
+				.anyMatch(obj -> obj.getMessage().contains("valid field can't be empty"))
+				);
+	}
+	
+	@Test
+	public void checkLaboratoryTest_addMethod() {
+		doAnswer(
+				invocation -> {
+					invocation
+					.getArgument(0, LaboratoryTest.class)
+					.getMethod()
+					.add(method);
+					return null;
+					}).when(method).setLaboratoryTest(any(LaboratoryTest.class));
+		laboratoryTest.addMethod(method);
+		
+		assertTrue(validator.validate(laboratoryTest).isEmpty());
+		assertTrue(laboratoryTest.getMethod().contains(method));
+	}
+	
+	@Test
+	public void checkLaboratoryTest_removeMethod() {	
+		doAnswer(
+				invocation -> {
+					laboratoryTest
+					.getMethod()
+					.remove(method);
+					return null;
+					}).when(method).setLaboratoryTest(isNull());
+		laboratoryTest.getMethod().add(method);
+		laboratoryTest.removeMethod(method);
+		
+		assertTrue(validator.validate(laboratoryTest).isEmpty());
+		assertTrue(!laboratoryTest.getMethod().contains(method));
 	}
 }
