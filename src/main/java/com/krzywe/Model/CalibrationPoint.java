@@ -137,6 +137,16 @@ public class CalibrationPoint extends AbstractPersistentObject {
 		this.targetValues.clear();
 		this.targetValues.addAll(targetValues);
 	}
+	
+	public void addTargetValue(TargetValue targetValue) {
+		targetValue.setCalibrationPoint(this);
+	}
+	
+	public void removeTargetValue(TargetValue targetValue) {
+		if (this.targetValues.contains(targetValue)) {
+			targetValue.setCalibrationPoint(null);
+		}
+	}
 
 	
 	
