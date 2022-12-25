@@ -122,8 +122,8 @@ public class CalibrationSet extends AbstractPersistentObject {
 	 * @throws NullPointerException in case of passed null as parameter.
 	 */
 	public void addCalibrationPoint(@NotNull CalibrationPoint calibrationPoint) throws NullPointerException {
-		if (calibrationPoint==null) throw new NullPointerException("calibrationPoint must not be null");
-		calibrationPoint.setCalibrationSet(this);
+		if (calibrationPoint!=null)
+			calibrationPoint.setCalibrationSet(this);
 	}
 	
 	/**
@@ -132,8 +132,7 @@ public class CalibrationSet extends AbstractPersistentObject {
 	 * @throws NullPointerException
 	 */
 	public void removeCalibrationPoint(CalibrationPoint calibrationPoint) throws NullPointerException {
-		if (calibrationPoint==null) throw new NullPointerException("calibrationPoint must not be null");
-		if (this.calibrationPoints.contains(calibrationPoint))
+		if (calibrationPoint!=null && this.calibrationPoints.contains(calibrationPoint))
 			calibrationPoint.setCalibrationSet(null);
 	}
 	
