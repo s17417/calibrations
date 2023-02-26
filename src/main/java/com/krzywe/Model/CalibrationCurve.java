@@ -1,58 +1,50 @@
 package com.krzywe.Model;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
-import javax.validation.constraints.Digits;
-
-import com.sun.istack.NotNull;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
 
 
 @Entity
-public class CalibrationCurve extends AbstractPersistentObject {
+@Table(uniqueConstraints = {
+		@UniqueConstraint(
+				name = "UK_CALIBRATION_CURVE_CALIBRATION_SET_ID_METHOD_ID",
+				columnNames = {"method_laboratoryTest_id","method_analyte_id","calibrationResultSet_id"}
+				)
+		}
+)
+public class CalibrationCurve extends AbstractPersistentObject implements Cloneable {
 
+	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	@Convert(converter = CalculateEquationConverter.class)
-	private ICalculateEquation iCalculateEquation;
-	
-	private BigDecimal coefficientOfDetermination;
-	
-	@OrderColumn
-	@ElementCollection
-	@Column(precision = 20, scale=12)
-	private List<@Digits(fraction = 12, integer = 20) BigDecimal> parameters = new ArrayList<>();
-	
-	@OneToMany(
+	@NotNull
+	@OneToOne(
 			fetch = FetchType.LAZY,
-			cascade = {CascadeType.ALL}
+			mappedBy = "calibrationCurve",
+			orphanRemoval = true,
+			cascade = CascadeType.ALL
 			)
-	@JoinColumn(
-			foreignKey = @ForeignKey(
-					name = "FK_CALIBRATIONCURVE_RESPONSEVALUE_ID"
-					)
-			)
-	private Set<ResponseValue>responseValues = new HashSet<>();
-	
+	@PrimaryKeyJoinColumn
+	private CalibrationCurveCalType calibrationCurveCalType;
+
 	@NotNull
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(
@@ -65,40 +57,39 @@ public class CalibrationCurve extends AbstractPersistentObject {
 	
 	@NotNull
 	@ManyToOne
-	@JoinColumns({
-		@JoinColumn(
-				nullable = false,
-				foreignKey = @ForeignKey(
-						name = "FK_CALIBRATIONCURVE_METHOD_LABORATORYTEST_ID",
-						foreignKeyDefinition = 
-								"FOREIGN KEY (laboratoryTest_Id)"
-								+ "REFERENCES Method (laboratoryTest_Id)"
-								+ "ON DELETE CASCADE"
-						)
-				),
-		@JoinColumn(
-				nullable = false,
-				foreignKey = @ForeignKey(
-						name = "FK_CALIBRATIONCURVE_METHOD_ANALYTE_ID",
-						foreignKeyDefinition = 
-								"FOREIGN KEY (analyte_Id)"
-								+ "REFERENCES Method (analyte_Id)"
-								+ "ON DELETE CASCADE"
-						)
-				)
+	@JoinColumns(foreignKey = @ForeignKey(
+			name="FK_CALIBRATIONCURVE_METHOD_ID",
+			foreignKeyDefinition = "FOREIGN KEY (method_laboratoryTest_id, method_analyte_id) "
+					+ "REFERENCES Method (laboratoryTest_id, analyte_id) "
+					+ "ON DELETE CASCADE"
+			),value={
+		@JoinColumn(nullable = false, name="method_laboratoryTest_id", referencedColumnName="laboratoryTest_id"),
+		@JoinColumn(nullable = false, name="method_analyte_id", referencedColumnName="analyte_id")
 	})
 	private Method method;
+	
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			name = "CalibrationCurve_Method",
+			joinColumns = {
+					@JoinColumn(nullable = false, name = "calibration_curve_id", referencedColumnName = "id")
+					},
+			inverseJoinColumns = {
+					@JoinColumn(nullable = false, name="secondary_quant_method_laboratoryTest_id", referencedColumnName="laboratoryTest_id"),
+					@JoinColumn(nullable = false, name="secondary_quant_method_analyte_id", referencedColumnName="analyte_id")
+					},
+			inverseForeignKey = @ForeignKey(
+					name="FK_SECONDARY_METHOD_ID_CALIBRATIONCURVE",
+					foreignKeyDefinition = "FOREIGN KEY (secondary_quant_method_laboratoryTest_id, secondary_quant_method_analyte_id) "
+							+ "REFERENCES Method (laboratoryTest_id, analyte_id) "
+							+ "ON DELETE CASCADE"
+					),
+			foreignKey = @ForeignKey(name = "FK__SECONDARY_METHOD_CALIBRATIONCURVE_ID")
+	)
+	private Set<Method> secondaryQuantMethod = new HashSet<>();
 
 	protected CalibrationCurve() {
 		super();
-	}
-
-	public ICalculateEquation getiCalculateEquation() {
-		return iCalculateEquation;
-	}
-
-	public void setiCalculateEquation(ICalculateEquation iCalculateEquation) {
-		this.iCalculateEquation = iCalculateEquation;
 	}
 
 	public CalibrationResultSet getCalibrationResultSet() {
@@ -127,53 +118,49 @@ public class CalibrationCurve extends AbstractPersistentObject {
 		this.method = method;
 	}
 
-	public List<BigDecimal> getParameters() {
-		return parameters;
+	public CalibrationCurveCalType getCalibrationCurveCalType() {
+		return calibrationCurveCalType;
 	}
 
-	public void setParameters(List<BigDecimal> parameters) {
-		this.parameters.clear();
-		this.parameters.addAll(iCalculateEquation.setParameters(parameters));
+	public void setCalibrationCurveCalType(CalibrationCurveCalType calibrationCurveCalType) {
+		if (calibrationCurveCalType==null) {
+			if ( this.calibrationCurveCalType!=null)
+				this.calibrationCurveCalType.setCalibrationCurve(null);
+		} else {
+			calibrationCurveCalType.setCalibrationCurve(this);
+		}
+		this.calibrationCurveCalType=calibrationCurveCalType;
+	}
+	
+	public Set<Method> getSecondaryQuantMethod() {
+		return secondaryQuantMethod;
 	}
 
-	public BigDecimal getCoefficientOfDetermination() {
-		return coefficientOfDetermination;
+	public void setSecondaryQuantMethod(Set<Method> secondaryQuantMethod) {
+		this.secondaryQuantMethod = secondaryQuantMethod;
+	}
+	
+	public void addSecondaryQuantMethod(Method method) {
+		secondaryQuantMethod.add(method);
+	}
+	
+	public void removeSecondaryQuantMethod(Method method) {
+		secondaryQuantMethod.remove(method);
 	}
 
-	public void setCoefficientOfDetermination(BigDecimal coefficientOfDetermination) {
-		this.coefficientOfDetermination = coefficientOfDetermination;
-	}
-
-	public Set<ResponseValue> getResponseValues() {
-		return responseValues;
-	}
-
-	public void setResponseValues(Set<ResponseValue> responseValues) {
-		this.responseValues.clear();
-		this.responseValues.addAll(responseValues);
-	}
-	
-	public void addResponseValue(ResponseValue responseValue) {
-		if (responseValue!=null)
-			responseValue.setCalibrationCurve(this);
+	/**
+	 * Clones an CalibrationCurve instance without id and all relations are null besides Method class.
+	 */
+	@Override
+	protected CalibrationCurve clone() throws CloneNotSupportedException {
+		var clone = new CalibrationCurve();
+		clone.setId(null);
+		clone.setMethod(this.getMethod());
+		clone.setSecondaryQuantMethod(secondaryQuantMethod);
+		return clone;
 	}
 	
-	public void removeResponseValue(ResponseValue responseValue) {
-		if (responseValue!=null && this.responseValues.contains(responseValue))
-			responseValue.setCalibrationCurve(null);
-	}
 	
-	public List<BigDecimal> calculateParameters() {
-		return iCalculateEquation.calculateParameters(responseValues);
-	}
-	
-	public Optional<BigDecimal> calculateCoefficientOfDetermination(){
-		return iCalculateEquation.calculateCoefficientOfDetermination(responseValues, parameters);
-	}
-	
-	public Optional<String> getEquation(){
-		return iCalculateEquation.getFormula(parameters);
-	}
 	
 	
 

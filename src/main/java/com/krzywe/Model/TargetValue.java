@@ -10,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.OnDelete;
@@ -23,6 +24,7 @@ public class TargetValue extends AbstractPersistentObject {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	@Positive
 	@Column(precision = 20, scale=12)
 	@Digits(fraction = 12, integer = 20)
 	private BigDecimal targetValue;

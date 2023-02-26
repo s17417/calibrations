@@ -14,10 +14,8 @@ public class MethodId implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@Column(name = "laboratoryTest_id")
 	private String laboratoryTestId;
 	
-	@Column (name = "analyte_id")
 	private String analyteId;
 
 	

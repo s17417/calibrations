@@ -1,45 +1,62 @@
 package com.krzywe.Model;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.Optional;
 
-import javax.persistence.Embeddable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import com.krzywe.Utils.Exceptions.CalculationResponseValueStrategyNullPointerException;
 
 @Entity
-public class ResponseValue extends AbstractPersistentObject implements Serializable {
+public class ResponseValue extends AbstractPersistentObject {
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private BigDecimal responseValue;
+	@NotNull
+	@PositiveOrZero
+	@Digits(fraction = 12, integer = 20)
+	@Column(precision = 32, scale=12, nullable = false)
+	private BigDecimal responseValue = BigDecimal.ZERO;
 	
-	@CreationTimestamp
-	private LocalDateTime createdDate;
+	@Positive
+	@Digits(fraction = 12, integer = 20)
+	@Column(precision = 32, scale=12)
+	private BigDecimal internalStdResponseValue;
 	
-	@UpdateTimestamp
-	private LocalDateTime modifiedDate;
+	@Positive
+	@Digits(fraction = 12, integer = 20)
+	@Column(precision = 32, scale=12)
+	private BigDecimal internalStdConcentration;/*=BigDecimal.ONE*/;
+	
+	@Transient
+	private Optional<ICalculationResponseValueStrategy> calculationResponseValueStrategy = ResponseValueCalculationFactoryImpl.getFactory()
+			.createCalculationStrategy("EXTERNAL_STD");
 	
 	private Boolean isActive=true;
 	
 	@NotNull
 	@ManyToOne
-	@JoinColumn(nullable = false)
-	private CalibrationCurve calibrationCurve;
+	@JoinColumn(
+			nullable = false,
+			foreignKey = @ForeignKey(name = "FK_RESPONSEVALUE_CALCULATEDCALIBRATIONCURVE_ID")
+	)
+	private CalculatedCalibrationCurve calculatedCalibrationCurve;
 	
 	@NotNull
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(
 			nullable = false,
 			foreignKey = @ForeignKey(name = "FK_RESPONSEVALUE_TARGETVALUE_ID"),
@@ -66,22 +83,6 @@ public class ResponseValue extends AbstractPersistentObject implements Serializa
 		this.targetValue = targetValue;
 	}
 
-	public LocalDateTime getCreatedDate() {
-		return createdDate;
-	}
-
-	public void setCreatedDate(LocalDateTime createdDate) {
-		this.createdDate = createdDate;
-	}
-
-	public LocalDateTime getModifiedDate() {
-		return modifiedDate;
-	}
-
-	public void setModifiedDate(LocalDateTime modifiedDate) {
-		this.modifiedDate = modifiedDate;
-	}
-
 	public Boolean getIsActive() {
 		return isActive;
 	}
@@ -90,21 +91,57 @@ public class ResponseValue extends AbstractPersistentObject implements Serializa
 		this.isActive = isActive;
 	}
 
-	public CalibrationCurve getCalibrationCurve() {
-		return calibrationCurve;
+	public CalculatedCalibrationCurve getCalculatedCalibrationCurve() {
+		return calculatedCalibrationCurve;
+	}
+	
+	public BigDecimal getResponseCalculationValue() throws CalculationResponseValueStrategyNullPointerException {
+		return calculationResponseValueStrategy
+				.orElseThrow(() -> new CalculationResponseValueStrategyNullPointerException("Calculation Strategy must not be null"))
+				.getResponseCalculationValue(responseValue, internalStdResponseValue);	
+	}
+	
+	public BigDecimal getTargetConcentrationValue() throws CalculationResponseValueStrategyNullPointerException {
+		return calculationResponseValueStrategy
+				.orElseThrow(() -> new CalculationResponseValueStrategyNullPointerException("Calculation Strategy must not be null"))
+				.getTargetConcentrationValue(targetValue.getTargetValue(), internalStdConcentration);	
 	}
 
-	public void setCalibrationCurve(CalibrationCurve calibrationCurve) {
-		if (this.calibrationCurve == null) {
-			if (calibrationCurve == null) return;
-			calibrationCurve.getResponseValues().add(this);
-				this.calibrationCurve=calibrationCurve;
+	public Optional<ICalculationResponseValueStrategy> getCalculationResponseValueStrategy() {
+		return calculationResponseValueStrategy;
+	}
+
+	protected void setCalculationResponseValueStrategy(ICalculationResponseValueStrategy calculationResponseValueStrategy) {
+		this.calculationResponseValueStrategy = Optional.ofNullable(calculationResponseValueStrategy);
+	}
+
+	public BigDecimal getInternalStdResponseValue() {
+		return internalStdResponseValue;
+	}
+
+	public void setInternalStdResponseValue(BigDecimal internalStdResponseValue) {
+		this.internalStdResponseValue = internalStdResponseValue;
+	}
+
+	public BigDecimal getInternalStdConcentration() {
+		return internalStdConcentration;
+	}
+
+	public void setInternalStdConcentration(BigDecimal internalStdConcentration) {
+		this.internalStdConcentration = internalStdConcentration;
+	}
+
+	public void setCalculatedCalibrationCurve(CalculatedCalibrationCurve calculatedCalibrationCurve) {
+		if (this.calculatedCalibrationCurve == null) {
+			if (calculatedCalibrationCurve == null) return;
+			calculatedCalibrationCurve.getResponseValues().add(this);
+				this.calculatedCalibrationCurve=calculatedCalibrationCurve;
 				return;
 		}
-		if (this.calibrationCurve.getResponseValues().remove(this)) {
-			this.calibrationCurve=calibrationCurve;
-			if (this.calibrationCurve!=null)
-				this.calibrationCurve.getResponseValues().add(this);
+		if (this.calculatedCalibrationCurve.getResponseValues().remove(this)) {
+			this.calculatedCalibrationCurve=calculatedCalibrationCurve;
+			if (this.calculatedCalibrationCurve!=null)
+				this.calculatedCalibrationCurve.getResponseValues().add(this);
 		}
 	}
 }

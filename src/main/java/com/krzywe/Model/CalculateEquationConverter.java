@@ -4,26 +4,20 @@ import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
 @Converter
-public class CalculateEquationConverter implements AttributeConverter<ICalculateEquation, String> {
+public class CalculateEquationConverter implements AttributeConverter<IFunctionStrategy, String> {
 
 	@Override
-	public String convertToDatabaseColumn(ICalculateEquation attribute) {
-		return attribute
-				.getClass()
-				.getSimpleName()
-				.isEmpty() ?
-						null :
-							attribute
-							.getClass()
-							.getSimpleName();
+	public String convertToDatabaseColumn(IFunctionStrategy attribute) {
+		return CalculationStrategyFactoryImpl.getFactory()
+				.getCalculationStrategyName(attribute)
+				.orElse(null);
 	}
 
 	@Override
-	public ICalculateEquation convertToEntityAttribute(String dbData) {
-		switch (dbData) {
-		case "LinearCalculation" : return new LinearCalculation();
-		default : return null;
-		}
+	public IFunctionStrategy convertToEntityAttribute(String dbData) {
+		return CalculationStrategyFactoryImpl.getFactory()
+				.createCalculationStrategy(dbData)
+				.orElse(null);
 	}
 
 }
