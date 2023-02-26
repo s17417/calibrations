@@ -46,8 +46,8 @@ public class CalibrationResultSet extends AbstractPersistentObject implements Cl
 			foreignKey = @ForeignKey(
 					name = "FK_CALIBRATIONRESULTSET_CALIBRATIONSET_ID",
 					foreignKeyDefinition =
-							"FOREIGN KEY (calibration_set_id) "
-							+ "REFERENCES calibration_set (Id) "
+							"FOREIGN KEY (calibrationSet_id) "
+							+ "REFERENCES calibrationSet (Id) "
 							+ "ON DELETE CASCADE"
 					)
 			)
@@ -61,8 +61,8 @@ public class CalibrationResultSet extends AbstractPersistentObject implements Cl
 			foreignKey = @ForeignKey(
 					name = "FK_CALIBRATIONRESULTSET_LABORATORYTEST_ID",
 					foreignKeyDefinition = 
-							"FOREIGN KEY (laboratory_test_id) "
-							+ "REFERENCES laboratory_test (id) "
+							"FOREIGN KEY (laboratoryTest_id) "
+							+ "REFERENCES laboratoryTest (id) "
 							+ "ON DELETE CASCADE"
 					)
 			)

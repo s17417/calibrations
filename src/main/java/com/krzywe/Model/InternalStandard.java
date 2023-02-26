@@ -12,14 +12,12 @@ import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
 import javax.persistence.OrderColumn;
-import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.UniqueElements;
 
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(name = "UK_INTERNAL_STANDARD_NAME", columnNames = {"name"})})
 public class InternalStandard extends AbstractPersistentObject {
 	
 	/**
