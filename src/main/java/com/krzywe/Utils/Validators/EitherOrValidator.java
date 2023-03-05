@@ -3,8 +3,8 @@ package com.krzywe.Utils.Validators;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class EitherOrValidator implements ConstraintValidator<EitherOr, Object> {
 

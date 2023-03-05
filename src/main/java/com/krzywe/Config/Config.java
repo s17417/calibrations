@@ -22,6 +22,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.mchange.v2.c3p0.PooledDataSource;
 
 @Configuration
 @EnableTransactionManagement
@@ -47,7 +48,7 @@ public class Config {
 	
 	
 	@Bean
-	@Primary
+	@Primary//tutaj tez zmienono z DataSource javax na PooledDataSorce
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder, DataSource dataSource) {
 		return builder
 	    		  .dataSource(dataSource)
@@ -66,7 +67,7 @@ public class Config {
 	   }
 	
 	@Bean
-    @Primary
+    @Primary//zmieniono z data source na pooledData source
     public DataSource dataSource() throws PropertyVetoException {
 		ComboPooledDataSource pooledDataSource = new ComboPooledDataSource();
 		

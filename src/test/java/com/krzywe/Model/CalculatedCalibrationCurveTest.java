@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeAll;

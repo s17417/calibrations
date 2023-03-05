@@ -3,8 +3,8 @@ package com.krzywe.Model;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 import org.assertj.core.util.Sets;
 import org.junit.jupiter.api.BeforeAll;

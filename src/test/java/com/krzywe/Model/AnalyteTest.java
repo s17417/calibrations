@@ -10,8 +10,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
+
 
 import org.apache.logging.log4j.util.Strings;
 import org.assertj.core.util.Lists;
@@ -31,6 +30,9 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -74,6 +76,7 @@ public class AnalyteTest {
 	@BeforeAll
 	public void beforeAll() {
 		validator = Validation.buildDefaultValidatorFactory().getValidator();
+
 	}
 	
 	@BeforeEach
@@ -95,7 +98,7 @@ public class AnalyteTest {
 		analyte.setName(name);
 		
 		var exp = validator.validate(analyte);
-		
+		System.out.println(exp);
 		assertTrue(
 				exp
 				.stream()

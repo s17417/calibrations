@@ -2,7 +2,7 @@ package com.krzywe.Model;
 
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class MethodId implements Serializable {

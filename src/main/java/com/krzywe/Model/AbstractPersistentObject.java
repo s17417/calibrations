@@ -4,16 +4,16 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Version;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Version;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.krzywe.Utils.IdGenerator;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
 
 @MappedSuperclass
 public abstract class AbstractPersistentObject implements Serializable{
@@ -25,7 +25,7 @@ public abstract class AbstractPersistentObject implements Serializable{
 
 	@Id
 	@Column(length = 36)
-	private String Id=IdGenerator.getId();
+	private String id=IdGenerator.getId();
 	
 	@Version
 	private Long version;
@@ -39,11 +39,11 @@ public abstract class AbstractPersistentObject implements Serializable{
 	
 
 	public String getId() {
-		return Id;
+		return id;
 	}
 
 	public void setId(String id) {
-		Id = id;
+		this.id = id;
 	}
 
 	
@@ -74,7 +74,7 @@ public abstract class AbstractPersistentObject implements Serializable{
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(Id);
+		return Objects.hash(id);
 	}
 
 	@Override
@@ -86,7 +86,7 @@ public abstract class AbstractPersistentObject implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		AbstractPersistentObject other = (AbstractPersistentObject) obj;
-		return Objects.equals(Id, other.Id);
+		return Objects.equals(id, other.id);
 	}
 	
 	

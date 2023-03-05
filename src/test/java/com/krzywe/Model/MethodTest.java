@@ -6,8 +6,8 @@ import static org.mockito.Mockito.when;
 import java.util.HashSet;
 import java.util.stream.Stream;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.BeforeAll;
