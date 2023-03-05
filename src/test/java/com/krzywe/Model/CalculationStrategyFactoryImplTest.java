@@ -12,7 +12,7 @@ public class CalculationStrategyFactoryImplTest {
 
 
 	@BeforeEach
-	private void beforeEach() {
+	public void beforeEach() {
 		factoryImpl = CalculationStrategyFactoryImpl.getFactory();
 	}
 	
