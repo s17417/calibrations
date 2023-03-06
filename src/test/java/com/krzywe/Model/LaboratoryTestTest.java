@@ -41,7 +41,7 @@ public class LaboratoryTestTest {
 	}
 	
 	@BeforeEach
-	private void beforeEach() {
+	public void beforeEach() {
 		laboratoryTest = new LaboratoryTest();
 		laboratoryTest.setName("laboratory Test");
 		laboratoryTest.setMaterialType(MaterialType.DBS);
