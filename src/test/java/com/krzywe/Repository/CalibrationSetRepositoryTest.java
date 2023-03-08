@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -19,6 +20,7 @@ import com.krzywe.Utils.Specifications.ICalibrationSetSpec;
 
 @DataJpaTest
 @TestPropertySource("classpath:test.properties")
+@Import(CalibrationSetSpec.class)
 @Sql(statements = {
 		"INSERT INTO CalibrationSet (id, name, materialType, preparationDate, expirationDate, createdDate) "
 				+ "VALUES ('786fa357-31ef-403b-ac97-088624b005e1', 'aaa', 'DBS','2022-05-04', '2022-06-04','2022-06-04 10:30')",
@@ -37,11 +39,13 @@ public class CalibrationSetRepositoryTest {
 	@Autowired
 	private CalibrationSetRepository repository;
 	
-	private ICalibrationSetSpec spec = new CalibrationSetSpec();
+	@Autowired
+	private ICalibrationSetSpec spec;
 	
 	@Test
 	public void testInjection() {
 		assertThat(repository).isNotNull();
+		assertThat(spec).isNotNull();
 	}
 	
 	@Test
