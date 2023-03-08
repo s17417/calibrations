@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import jakarta.persistence.criteria.Predicate;
 
 @Component
 public class CalibrationSetSpec implements ICalibrationSetSpec {
+	private Supplier<Optional<Specification<CalibrationSet>>> emptySpec = () -> Optional.of(Specification.<CalibrationSet>where(null));
 	
 	public Optional<Specification<CalibrationSet>> nameLikeSpecification(String name){
 		Specification<CalibrationSet> spec = (root, q, cb) -> 
@@ -25,7 +27,7 @@ public class CalibrationSetSpec implements ICalibrationSetSpec {
 		return Optional
 				.ofNullable(spec)
 				.filter(obj -> name!=null)
-				.or(() -> Optional.of(Specification.<CalibrationSet>where(null)));
+				.or(emptySpec);
 	}
 	
 	public Optional<Specification<CalibrationSet>> exactMaterialTypeSpecification(MaterialType materialType){
@@ -34,7 +36,7 @@ public class CalibrationSetSpec implements ICalibrationSetSpec {
 		return Optional
 				.ofNullable(spec)
 				.filter(obj -> materialType!=null)
-				.or(() -> Optional.of(Specification.<CalibrationSet>where(null)));		      
+				.or(emptySpec);		      
 	}
 	
 	public Optional<Specification<CalibrationSet>> createdDateRangeSpecification(LocalDateTime from, LocalDateTime to){
@@ -47,7 +49,7 @@ public class CalibrationSetSpec implements ICalibrationSetSpec {
 		return Optional
 				.ofNullable(spec)
 				.filter(obj -> from!=null||to!=null)
-				.or(() -> Optional.of(Specification.<CalibrationSet>where(null)));
+				.or(emptySpec);
 	}
 	
 	public Optional<Specification<CalibrationSet>> preprationDateRangeSpecification(LocalDate from, LocalDate to){
@@ -60,7 +62,7 @@ public class CalibrationSetSpec implements ICalibrationSetSpec {
 		return Optional
 				.ofNullable(spec)
 				.filter(obj -> from!=null||to!=null)
-				.or(() -> Optional.of(Specification.<CalibrationSet>where(null)));
+				.or(emptySpec);
 	}
 	
 	@Override
