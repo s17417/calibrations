@@ -14,13 +14,13 @@ import org.springframework.test.context.jdbc.Sql;
 
 import com.krzywe.DTO.SimpleCalibrationSetView;
 import com.krzywe.Model.MaterialType;
-import com.krzywe.Utils.Specifications.CalibrationSetSpec;
+import com.krzywe.Utils.Specifications.CalibrationSetSpecImpl;
 import com.krzywe.Utils.Specifications.ICalibrationSetSpec;
 
 
 @DataJpaTest
 @TestPropertySource("classpath:test.properties")
-@Import(CalibrationSetSpec.class)
+@Import(CalibrationSetSpecImpl.class)
 @Sql(statements = {
 		"INSERT INTO CalibrationSet (id, name, materialType, preparationDate, expirationDate, createdDate) "
 				+ "VALUES ('786fa357-31ef-403b-ac97-088624b005e1', 'aaa', 'DBS','2022-05-04', '2022-06-04','2022-06-04 10:30')",
