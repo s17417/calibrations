@@ -8,7 +8,7 @@ public class EntityNotFoundException extends Exception {
 	private static final long serialVersionUID = 1L;
 
 	public EntityNotFoundException(Class<?> entityClass) {
-		super("Entity of type:"+entityClass.getSimpleName()+"not found.");
+		super("Entity of type: "+entityClass.getSimpleName()+" not found.");
 	}
 
 	public EntityNotFoundException(Class<?> entityClass, String message) {
