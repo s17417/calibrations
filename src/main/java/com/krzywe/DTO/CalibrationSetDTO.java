@@ -4,9 +4,6 @@ import java.time.LocalDate;
 
 import com.krzywe.Model.MaterialType;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,7 +14,6 @@ public class CalibrationSetDTO {
 	
 	@NotBlank
 	@Size(min=3, max=50)
-	@Column(nullable=false, length = 50)
 	private String name;
 	
 	@PastOrPresent
@@ -27,8 +23,6 @@ public class CalibrationSetDTO {
 	private LocalDate expirationDate;
 	
 	@NotNull
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
 	private MaterialType materialType;
 
 	public String getName() {
