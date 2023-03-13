@@ -56,7 +56,7 @@ public class CalibrationPoint extends AbstractPersistentObject {
 	private List<@Size(min = 3,max = 32) String> aliases = new ArrayList<String>();
 
 	@NotNull
-	@ManyToOne(optional = false)
+	@ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(nullable = false,foreignKey = @ForeignKey(name="FK_CALIBRATION_SET_ID"))
 	private CalibrationSet calibrationSet;
 	
