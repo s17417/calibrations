@@ -8,12 +8,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderColumn;
@@ -24,6 +26,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.UniqueElements;
+
+// TODO Change this class as combained id field of calibration set and point id - easier to add unique constraint on alias and to fins all targetvalues for calibratonset
 
 
 /**
@@ -46,12 +50,23 @@ public class CalibrationPoint extends AbstractPersistentObject {
 	@Size(min = 3, max = 32)
 	@Column(nullable = false, length = 32)
 	private String pointId;
-
+	
 	@Size(max = 32, message = "{aliases.Size.message}")
 	@ElementCollection(fetch = FetchType.LAZY)
 	@UniqueElements
 	@OrderColumn(name = "ALIAS_ORDER")
-	@JoinColumn(foreignKey = @ForeignKey(name="FK_CALIBRATION_POINT_ID"))
+	 @CollectionTable(joinColumns =  {
+			@JoinColumn(name="calibrationPoint_id", referencedColumnName="id"),
+			@JoinColumn(name="calibrationSet_id", referencedColumnName="calibrationSet_id")
+			},
+	 foreignKey = @ForeignKey(name="FK_CALIBRATION_POINT_ID"),
+	 uniqueConstraints = {
+			 @UniqueConstraint(
+					 name = "UK_CALIBRATION_POINTID_CALIBRATIONSETID_ALIASES",
+					columnNames = {"calibrationSet_id", "aliases"}
+					)
+			})
+	//@JoinColumn(foreignKey = @ForeignKey(name="FK_CALIBRATION_POINT_ID"))
 	@Column(length = 32)
 	private List<@Size(min = 3,max = 32) String> aliases = new ArrayList<String>();
 
