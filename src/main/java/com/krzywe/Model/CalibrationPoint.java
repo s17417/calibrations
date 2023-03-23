@@ -52,7 +52,7 @@ public class CalibrationPoint extends AbstractPersistentObject {
 	private String pointId;
 	
 	@Size(max = 32, message = "{aliases.Size.message}")
-	@ElementCollection(fetch = FetchType.LAZY)
+	@ElementCollection(fetch = FetchType.EAGER)
 	@UniqueElements
 	@OrderColumn(name = "ALIAS_ORDER")
 	 @CollectionTable(joinColumns =  {
