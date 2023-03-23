@@ -1,14 +1,24 @@
 package com.krzywe.Repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.krzywe.DTO.AnalyteView;
 import com.krzywe.DTO.CalibrationPointView;
+import com.krzywe.DTO.TargetValueView;
 import com.krzywe.Model.Analyte;
+import com.krzywe.Model.CalibrationPoint;
 import com.krzywe.Model.TargetValue;
 
 
@@ -34,6 +44,11 @@ import com.krzywe.Model.TargetValue;
 				+ "VALUES ('786fa357-31ef-403b-ac97-088624b005t1', 50.0, 'umol/L', '786fa357-31ef-403b-ac97-088624b005p1', '786fa357-31ef-403b-ac97-088624b005a1')",
 		"INSERT INTO TargetValue (id, targetValue, Units, calibrationPoint_id, analyte_id) "
 				+ "VALUES ('786fa357-31ef-403b-ac97-088624b005t2', 30.0, 'umol/L', '786fa357-31ef-403b-ac97-088624b005p1', '786fa357-31ef-403b-ac97-088624b005a2')",
+				
+		"INSERT INTO CalibrationPoint_aliases (calibrationSet_id, CalibrationPoint_id, aliases, ALIAS_ORDER) "
+				+ "VALUES ('786fa357-31ef-403b-ac97-088624b005s1', '786fa357-31ef-403b-ac97-088624b005p1', 'ADA', 0)",
+		"INSERT INTO CalibrationPoint_aliases (calibrationSet_id, CalibrationPoint_id, aliases, ALIAS_ORDER) "
+				+ "VALUES ('786fa357-31ef-403b-ac97-088624b005s1', '786fa357-31ef-403b-ac97-088624b005p1', 'AZA', 1)"
 		}
 )
 public class CalibrationPointRepositoryTest {
@@ -46,43 +61,78 @@ public class CalibrationPointRepositoryTest {
 		assertThat(repository).isNotNull();
 	}
 	
+	@Test
 	public void testFindCalibrationPointByIdAsView() {
-		var result = repository.findCalibrationPointByIdAsView("786fa357-31ef-403b-ac97-088624b005a1");
+		var result = repository.findCalibrationPointById("786fa357-31ef-403b-ac97-088624b005p1");
+		
 		assertThat(result)
 		.isPresent()
 		.get()
+		.satisfies(obj -> assertThat(obj.getAliases()))
+		.isInstanceOf(CalibrationPointView.class)
 		.satisfies(obj -> 
 			assertThat(obj.getTargetValues())
 			.isNotEmpty()
 			.hasSize(2)
 			.elements(0,1)
-			.isOfAnyClassIn(CalibrationPointView.class)
-			.isOfAnyClassIn(TargetValue.class)
-			.allSatisfy(objt -> assertThat(objt.getAnalyte())
-					.isNotNull()
-					.isOfAnyClassIn(Analyte.class)
-					)
-			);
+			.allSatisfy(objt -> {
+				assertThat(objt)
+				.isInstanceOf(TargetValueView.class);
+				assertThat(objt.getAnalyte())
+				.isNotNull()
+				.isInstanceOf(AnalyteView.class);
+			})
+		);
 	}
 	
+	@Test
 	public void testFindAllAsView() {
-		var result = repository.findAllAsView("786fa357-31ef-403b-ac97-088624b005s1");
+		var result = repository.findAllByCalibrationSetId("786fa357-31ef-403b-ac97-088624b005s1");
 		assertThat(result)
 		.isNotEmpty()
 		.hasSize(2)
 		.elements(0,1)
-		.isOfAnyClassIn(CalibrationPointView.class)
-		.allSatisfy(obj -> 
+		.allSatisfy(obj -> {
+			assertThat(obj)
+			.isInstanceOf(CalibrationPointView.class);
+			if (!obj.getTargetValues().isEmpty())
 			assertThat(obj.getTargetValues())
-			.isNotEmpty()
-			.hasSize(2)
 			.elements(0,1)
-			.isOfAnyClassIn(TargetValue.class)
-			.allSatisfy(objt -> assertThat(objt.getAnalyte())
-					.isNotNull()
-					.isOfAnyClassIn(Analyte.class)
-					)
-			);
+			.allSatisfy(objt -> {
+				assertThat(objt)
+				.isInstanceOf(TargetValueView.class);
+				assertThat(objt.getAnalyte())
+				.isNotNull()
+				.isInstanceOf(AnalyteView.class);
+			});
+		});
+	}
+	
+	@Test
+	public void testfindAliases() {
+		var result = repository.findAliases("786fa357-31ef-403b-ac97-088624b005p1");
+		assertThat(result)
+		.isNotEmpty()
+		.hasSize(2);
+	}
+	
+	@Test
+	public void testFindByPointId() {
+		var result = repository.findByPointId("calibrationPoint_1");
+		assertThat(result)
+		.isNotEmpty()
+		.satisfies(obj -> assertThat(obj.get().getPointId()).isEqualTo("calibrationPoint_1"));
 	}
 
+	@Test
+	public void testFindByAlias() {
+		var result = repository.findOneByAliasesAndCalibrationSetId("ADA","786fa357-31ef-403b-ac97-088624b005s1");
+		assertThat(result)
+		.isNotEmpty()
+		.get()
+		.satisfies(obj -> {
+			assertThat(obj).isOfAnyClassIn(CalibrationPoint.class);
+			assertThat(obj.getAliases()).contains("ADA", "AZA");
+		});
+	}
 }
