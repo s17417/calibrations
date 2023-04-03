@@ -1,5 +1,6 @@
 package com.krzywe.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,5 +27,12 @@ public interface CalibrationPointRepository extends JpaRepository<CalibrationPoi
 			+ "FROM CalibrationPoint_aliases c "
 			+ "WHERE c.CalibrationPoint_id=?1", nativeQuery = true)
 	public List<String> findAliases(String id);
+	
+	@Query(value = "SELECT c.pointId "
+			+ "FROM CalibrationPoint c "
+			+ "WHERE c.calibrationSet_id=:calibrationSetId "
+			+ "AND c.pointId IN :aliases",
+			nativeQuery = true)
+	public List<String> existsByCalibrationSetIdAndPointId(String calibrationSetId, Collection<String> aliases);
 
 }

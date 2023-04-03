@@ -2,7 +2,6 @@ package com.krzywe.Utils.Exceptions;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,14 +25,14 @@ public class RestResponseEntityExceptionHandler{
 				.unprocessableEntity()
 				.body(new DefaultErrorScheme(
 						currentApiVersion,
-						HttpStatus.UNPROCESSABLE_ENTITY.toString(),
+						Integer.toString(HttpStatus.UNPROCESSABLE_ENTITY.value()),
 						ex.getClass().getSimpleName(),
 						ex.getConstraintViolations()
 						.stream()
 						.map(obj -> new DefaultErrorScheme.Error(
 								req.getRequestURI(),
 								obj.getMessage(),
-								"invalid field: "+obj.getPropertyPath().toString()+" - object: "+obj.getRootBeanClass().getSimpleName()
+								"invalid field: "+ obj.getPropertyPath()
 								))
 						.collect(Collectors.toList())
 						));		
@@ -53,7 +52,7 @@ public class RestResponseEntityExceptionHandler{
 						.map(obj -> new DefaultErrorScheme.Error(
 								req.getRequestURI(),
 								obj.getDefaultMessage(),
-								"invalid field: "+((FieldError) obj).getField()+" - object: "+obj.getObjectName()
+								"invalid field: "+((FieldError) obj).getField()
 								))
 						.collect(Collectors.toList())
 						));		

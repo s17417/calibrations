@@ -1,25 +1,19 @@
 package com.krzywe.Repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.krzywe.DTO.AnalyteView;
 import com.krzywe.DTO.CalibrationPointView;
 import com.krzywe.DTO.TargetValueView;
-import com.krzywe.Model.Analyte;
 import com.krzywe.Model.CalibrationPoint;
-import com.krzywe.Model.TargetValue;
 
 
 @DataJpaTest
@@ -134,5 +128,17 @@ public class CalibrationPointRepositoryTest {
 			assertThat(obj).isOfAnyClassIn(CalibrationPoint.class);
 			assertThat(obj.getAliases()).contains("ADA", "AZA");
 		});
+	}
+	
+	@Test
+	public void testExistsByCalibrationSetIdAndPointId_Exists() {
+		var result = repository.existsByCalibrationSetIdAndPointId("786fa357-31ef-403b-ac97-088624b005s1", List.of("calibrationPoint_1","calibrationPoint_2"));
+		assertTrue(!result.isEmpty());
+	}
+	
+	@Test
+	public void testExistsByCalibrationSetIdAndPointId_DontExists() {
+		var result = repository.existsByCalibrationSetIdAndPointId("786fa357-31ef-403b-ac97-088624b005s1", List.of("calibrationPoint_3","calibrationPoint_4"));
+		assertTrue(result.isEmpty());
 	}
 }
