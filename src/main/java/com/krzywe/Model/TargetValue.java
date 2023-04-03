@@ -31,7 +31,7 @@ public class TargetValue extends AbstractPersistentObject {
 	
 	@Size(max = 50)
 	@Column(length = 50)
-	private String Units;
+	private String units;
 	
 	@NotNull(message = "valid field can't be empty")
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -53,11 +53,11 @@ public class TargetValue extends AbstractPersistentObject {
 	}
 
 	public String getUnits() {
-		return Units;
+		return units;
 	}
 
 	public void setUnits(String units) {
-		Units = units;
+		this.units = units;
 	}
 
 	public Analyte getAnalyte() {

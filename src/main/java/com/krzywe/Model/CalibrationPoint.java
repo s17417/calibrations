@@ -25,6 +25,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import org.hibernate.annotations.Check;
 import org.hibernate.validator.constraints.UniqueElements;
 
 // TODO Change this class as combained id field of calibration set and point id - easier to add unique constraint on alias and to fins all targetvalues for calibratonset
