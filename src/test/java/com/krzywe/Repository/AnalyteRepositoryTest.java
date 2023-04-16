@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.TestPropertySource;
@@ -60,13 +62,14 @@ public class AnalyteRepositoryTest {
 		.allSatisfy(obj -> obj.getName().contains("analyte"));
 	}
 	
-	@Test
-	public void aliasExistTest() {
-		var result = repository.aliasExists(List.of("APA"));
+	@ParameterizedTest
+	@ValueSource(strings = {"analyte_1","APA"})
+	public void aliasExistTest(String value) {
+		var result = repository.aliasExists(List.of(value));
 		assertThat(result)
 		.hasSize(1)
 		.element(0)
 		.usingComparator(String::compareTo)
-		.isEqualTo("APA");
+		.isEqualTo(value);
 	}
 }

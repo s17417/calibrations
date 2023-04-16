@@ -46,7 +46,7 @@ public class AnalyteServiceImpl implements IAnalyteService {
 		var aliasExists = repository.aliasExists(analyte.getAliases());
 		Analyte result = null;
 		
-		if (aliasExists.isEmpty())
+		if (aliasExists.isEmpty() && !analyte.getAliases().contains(analyte.getName()))
 			result = repository.save(analyte);
 		else throw new UniquePropertyException(
 				Analyte.class,
@@ -66,7 +66,7 @@ public class AnalyteServiceImpl implements IAnalyteService {
 		Analyte updatedEntity = mapper.updateToEntity(analyte, analyteDTO);
 		var aliasExists = repository.aliasExists(updatedEntity.getAliases());
 		
-		if (aliasExists.isEmpty())
+		if (aliasExists.isEmpty() && !analyte.getAliases().contains(analyte.getName()))
 			updatedEntity = repository.save(updatedEntity);
 		else throw new UniquePropertyException(
 				Analyte.class,

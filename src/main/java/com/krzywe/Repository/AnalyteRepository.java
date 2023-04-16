@@ -20,8 +20,10 @@ public interface AnalyteRepository extends JpaRepository<Analyte, String>, JpaSp
 	@Query("SELECT a.id AS id, a.name AS name FROM Analyte a")
 	public List<AnalyteNamesView> findAnalytesNames();
 	
-	@Query(value = "SELECT c.aliases "
-			+ "FROM analyte_aliases c "
-			+ "WHERE upper(c.aliases) in (upper(:alias))", nativeQuery=true)
+	@Query(value = "SELECT DISTINCT :alias "
+			+ "FROM analyte a "
+			+ "LEFT JOIN analyte_aliases c ON a.id=c.analyte_id "
+			+ "WHERE upper(:alias) in (upper(c.aliases)) "
+			+ "OR upper(:alias)=upper(a.name)", nativeQuery=true)
 	public List<String> aliasExists(List<String> alias);
 }
