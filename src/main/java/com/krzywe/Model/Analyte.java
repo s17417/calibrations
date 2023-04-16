@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -48,7 +49,15 @@ public class Analyte extends AbstractPersistentObject {
 	@ElementCollection(fetch = FetchType.LAZY)
 	@UniqueElements
 	@OrderColumn(name = "ALIAS_ORDER")
-	@JoinColumn(foreignKey = @ForeignKey(name = "FK_ANALYTE_ID"))
+	@CollectionTable(
+			foreignKey = @ForeignKey(name = "FK_ANALYTE_ID"),
+			uniqueConstraints = {
+					@UniqueConstraint(
+							name = "UK_ANALYTE_ALIASES",
+							columnNames = {"aliases"}
+							)
+			})
+	//@JoinColumn(foreignKey = @ForeignKey(name = "FK_ANALYTE_ID"))
 	@Column(length = 32)
 	private List<@Size(min = 3, max = 32) String> aliases = new ArrayList<>();
 
