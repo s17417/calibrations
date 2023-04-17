@@ -1,6 +1,10 @@
 package com.krzywe.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,15 +47,21 @@ public class AnalyteServiceImpl implements IAnalyteService {
 	@Override
 	public AnalyteWithAliasesView create(AnalyteDTO analyteDTO) throws NoSuchFieldException, SecurityException, UniquePropertyException {
 		var analyte = mapper.analyeDTOtoAnalyte(analyteDTO);
-		var aliasExists = repository.aliasExists(analyte.getAliases());
+		var listAliases = analyte
+				.getAliases()
+				.stream()
+				.map(String::toUpperCase)
+				.collect(Collectors.toList());
+		var aliasExistsAsName = repository.findNames(listAliases);
+		var nameExistsAsAlias = repository.findAliases(List.of(analyte.getName().toUpperCase()));
 		Analyte result = null;
 		
-		if (aliasExists.isEmpty() && !analyte.getAliases().contains(analyte.getName()))
+		if (aliasExistsAsName.isEmpty() && nameExistsAsAlias.isEmpty() && !analyte.getAliases().contains(analyte.getName()))
 			result = repository.save(analyte);
 		else throw new UniquePropertyException(
 				Analyte.class,
 				List.of(Analyte.class.getDeclaredField(Analyte_.ALIASES)),
-				aliasExists
+				Stream.concat(aliasExistsAsName.stream(), nameExistsAsAlias.stream()).toList()
 				);
 		
 		return factory
@@ -64,14 +74,21 @@ public class AnalyteServiceImpl implements IAnalyteService {
 				.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException(Analyte.class));
 		Analyte updatedEntity = mapper.updateToEntity(analyte, analyteDTO);
-		var aliasExists = repository.aliasExists(updatedEntity.getAliases());
 		
-		if (aliasExists.isEmpty() && !analyte.getAliases().contains(analyte.getName()))
+		var listAliases = updatedEntity
+				.getAliases()
+				.stream()
+				.map(String::toUpperCase)
+				.collect(Collectors.toList());
+		var aliasExistsAsName = repository.findNames(listAliases);
+		var nameExistsAsAlias = repository.findAliases(List.of(updatedEntity.getName().toUpperCase()));
+		
+		if (aliasExistsAsName.isEmpty() && nameExistsAsAlias.isEmpty() && !analyte.getAliases().contains(analyte.getName()))
 			updatedEntity = repository.save(updatedEntity);
 		else throw new UniquePropertyException(
 				Analyte.class,
 				List.of(Analyte.class.getDeclaredField(Analyte_.ALIASES)),
-				aliasExists
+				Stream.concat(aliasExistsAsName.stream(), nameExistsAsAlias.stream()).toList()
 				);
 		
 		return factory.createProjection(AnalyteWithAliasesView.class, updatedEntity);

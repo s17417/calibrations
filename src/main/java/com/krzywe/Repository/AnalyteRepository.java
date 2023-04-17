@@ -20,10 +20,24 @@ public interface AnalyteRepository extends JpaRepository<Analyte, String>, JpaSp
 	@Query("SELECT a.id AS id, a.name AS name FROM Analyte a")
 	public List<AnalyteNamesView> findAnalytesNames();
 	
-	@Query(value = "SELECT DISTINCT :alias "
+	
+	/**
+	 * List must contain uppercase strings (comparision based on uppercase) 
+	 * @param alias
+	 * @return
+	 */
+	@Query(value = "SELECT c.aliases "
+			+ "FROM analyte_aliases c "
+			+ "WHERE upper(c.aliases) IN (:names) ", nativeQuery=true)
+	public List<String> findAliases(List<String> names);
+	
+	/**
+	 * List must contain uppercase strings (comparision based on uppercase) 
+	 * @param alias
+	 * @return
+	 */
+	@Query(value = "SELECT a.name "
 			+ "FROM analyte a "
-			+ "LEFT JOIN analyte_aliases c ON a.id=c.analyte_id "
-			+ "WHERE upper(:alias) in (upper(c.aliases)) "
-			+ "OR upper(:alias)=upper(a.name)", nativeQuery=true)
-	public List<String> aliasExists(List<String> alias);
+			+ "WHERE upper(a.name) IN (:aliasList)", nativeQuery=true)
+	public List<String> findNames(List<String> aliasList);
 }

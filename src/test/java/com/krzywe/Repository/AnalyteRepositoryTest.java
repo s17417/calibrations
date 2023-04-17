@@ -2,9 +2,12 @@ package com.krzywe.Repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -62,14 +65,42 @@ public class AnalyteRepositoryTest {
 		.allSatisfy(obj -> obj.getName().contains("analyte"));
 	}
 	
-	@ParameterizedTest
-	@ValueSource(strings = {"analyte_1","APA"})
-	public void aliasExistTest(String value) {
-		var result = repository.aliasExists(List.of(value));
+	@Test
+	public void findNames() {
+		var result = repository.findNames(
+				List.of("analyte_1","analyte_2")
+				.stream()
+				.map(String::toUpperCase)
+				.collect(Collectors.toList())
+				);
+		
 		assertThat(result)
-		.hasSize(1)
-		.element(0)
-		.usingComparator(String::compareTo)
-		.isEqualTo(value);
+		.hasSize(2)
+		.containsAll(List.of("analyte_1","analyte_2"));
+	}
+	
+	@ParameterizedTest
+	@MethodSource("aliasListFactory")
+	public void findAliasesTest(List<String> value) {
+		var result = repository.findAliases(
+				value
+				.stream()
+				.map(String::toUpperCase)
+				.collect(Collectors.toList())
+				);
+		
+		assertThat(result)
+		.hasSize(value.size())
+		.containsAll(value);
+	}
+	
+	
+	
+	public static Stream<List<String>> aliasListFactory(){
+		return Stream.of(
+				List.of("ALA","APA"),
+				List.of("APA"),
+				List.of("APA")
+				);
 	}
 }

@@ -11,12 +11,15 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -72,12 +75,15 @@ public class AnalyteServiceTest {
 		dto.setAliases(analyte.getAliases());
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void createTest() {
 		when(mapper.analyeDTOtoAnalyte(any(AnalyteDTO.class)))
 		.thenReturn(analyte);
-		when(repository.aliasExists(anyList()))
+		when(repository.findNames(anyList()))
 		.thenReturn(List.of());
+		when(repository.findAliases(anyList()))
+		.thenReturn(List.of());		
 		when(repository.save(any(Analyte.class)))
 		.thenReturn(analyte);
 		when(factory.createProjection(isA(Class.class),any(Analyte.class)))
@@ -90,27 +96,39 @@ public class AnalyteServiceTest {
 		
 	}
 	
-	@Test
-	public void createTest_shouldThrowUniquePropertyException() {
+	@ParameterizedTest
+	@MethodSource("listFactory")
+	public void createTest_shouldThrowUniquePropertyException(List<List<String>> list) {
 		when(mapper.analyeDTOtoAnalyte(any(AnalyteDTO.class)))
 		.thenReturn(analyte);
-		when(repository.aliasExists(anyList()))
-		.thenReturn(List.of("alias_1"));
-		
+		when(repository.findNames(anyList()))
+		.thenReturn(list.get(0));
+		when(repository.findAliases(anyList()))
+		.thenReturn(list.get(1));		
 		var result = assertThrows(UniquePropertyException.class,() -> serviceImpl.create(dto));
 		assertThat(result.getMessage())
 		.isNotNull()
 		.contains("Analyte","violates unique field constraint on property");
 	}
 	
+	private Stream<List<List<String>>> listFactory(){
+		return Stream.of(
+				List.of(List.of("analyte_1"), List.<String>of()),
+				List.of(List.<String>of(), List.of("APA"))
+				);
+	}
+	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void updateTest() {
 		when(repository.findById(anyString()))
 		.thenReturn(Optional.of(analyte));
 		when(mapper.updateToEntity(any(Analyte.class), any(AnalyteDTO.class)))
 		.thenReturn(analyte);
-		when(repository.aliasExists(anyList()))
+		when(repository.findNames(anyList()))
 		.thenReturn(List.of());
+		when(repository.findAliases(anyList()))
+		.thenReturn(List.of());	
 		when(repository.save(any(Analyte.class)))
 		.thenReturn(analyte);
 		when(factory.createProjection(isA(Class.class),any(Analyte.class)))
@@ -136,14 +154,17 @@ public class AnalyteServiceTest {
 		.contains("Analyte","not found");
 	}
 	
-	@Test
-	public void updateTest_shouldUniquePropertyException() {
+	@ParameterizedTest
+	@MethodSource("listFactory")
+	public void updateTest_shouldUniquePropertyException(List<List<String>> list) {
 		when(repository.findById(anyString()))
 		.thenReturn(Optional.of(analyte));
 		when(mapper.updateToEntity(any(Analyte.class), any(AnalyteDTO.class)))
 		.thenReturn(analyte);
-		when(repository.aliasExists(anyList()))
-		.thenReturn(List.of("alias_1"));
+		when(repository.findNames(anyList()))
+		.thenReturn(list.get(0));
+		when(repository.findAliases(anyList()))
+		.thenReturn(list.get(1));
 		
 		var result = assertThrows(
 				UniquePropertyException.class,
