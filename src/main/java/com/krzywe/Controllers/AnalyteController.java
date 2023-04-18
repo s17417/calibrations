@@ -51,8 +51,8 @@ public class AnalyteController {
 		return ResponseEntity
 				 .created(ServletUriComponentsBuilder
 							.fromCurrentRequest()
-							.build()
-							.toUri()
+							.path("/{id}")
+							.build(result.getId())
 							)
 				 .body(result);	
 	}
@@ -86,7 +86,7 @@ public class AnalyteController {
 	@GetMapping(
 			produces = MediaType.APPLICATION_JSON_VALUE
 			)
-	public ResponseEntity<Page<AnalyteView>> getById(
+	public ResponseEntity<Page<AnalyteView>> getAll(
 			@RequestParam(required = false) String name,
 			@RequestParam(required = false) String alias,
 			@RequestParam(defaultValue = "0") int pageNumber,
